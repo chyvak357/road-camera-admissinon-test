@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  postgres_db:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: images-db
+    volumes:
+      - /home/user299/Repo/camera_test/postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+
+  api_service:
+    build: ./api_service
+    volumes:
+      - ./config:/app/config
+      - ./config.toml:/app/config.toml
+      - ./logs/api_service:/app/logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres_db
+
+  processing_service:
+    build: ./image_processing_service
+    volumes:
+      - ./config:/app/config
+      - ./config.toml:/app/config.toml
+      - ./logs/processing_service:/app/logs
+    depends_on:
+      - redis
+
+  saving_service:
+    build: ./image_saving_service
+    volumes:
+      - ./config:/app/config
+      - ./config.toml:/app/config.toml
+      - ./logs/saving_service:/app/logs
+    depends_on:
+      - redis
+      - postgres_db
+      - api_service

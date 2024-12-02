@@ -1,0 +1,14 @@
+[database]
+db_name = "images-db"
+db_host = "postgres_db"
+db_port = "5432"
+db_user = "admin"
+db_password = "admin"
+
+[redis]
+host="redis" 
+port="6379"
+
+[text]
+size=12
+font="Arial"
